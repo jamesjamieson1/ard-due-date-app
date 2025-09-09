@@ -1,0 +1,22 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"   # every 3 hours
+  workflow_dispatch:         # lets you trigger it manually
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit app with timestamp
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://ard-due-date-app-sduxc8gfbqk2ab639k4xjo.streamlit.app/)
+          echo "[$TIMESTAMP] HTTP status code: $STATUS"
+          if [ "$STATUS" -eq 200 ]; then
+            echo "[$TIMESTAMP] Ping successful ✅"
+          else
+            echo "[$TIMESTAMP] Ping failed ❌"
+            exit 1
+          fi
